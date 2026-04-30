@@ -1,0 +1,24 @@
+version: 2.1
+
+jobs:
+  lmx-pick:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - run:
+          name: Install lmx
+          command: pip install lmx
+      - run:
+          name: Pick model for task
+          command: |
+            echo "Summarize API docs" | lmx pick --stdin --budget 0.05 --json >> $CIRCLE_ARTEFACT/lmx-result.json
+      - store_artifacts:
+          path: lmx-result.json
+          destination: lmx-result
+
+workflows:
+  lmx-workflow:
+    jobs:
+      - lmx-pick:
+          context: lmx-keys  # Requires env vars in CircleCI context

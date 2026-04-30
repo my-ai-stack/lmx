@@ -1,0 +1,39 @@
+# GitLab CI example — lmx model picker integration
+# Add to your .gitlab-ci.yml or include from another file
+
+lmx-check:
+  image: python:3.11-slim
+  stage: test
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  cache:
+    key: "${CI_COMMIT_REF_SLUG}"
+    paths:
+      - .cache/pip
+  before_script:
+    - pip install lmx
+  script:
+    - |
+      echo "Summarize API docs" | lmx pick --stdin --budget 0.05 --json
+    - |
+      echo "Write unit tests" | lmx pick --stdin --code --budget 0.50 --json
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+lmx-code-review:
+  image: python:3.11-slim
+  stage: review
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  cache:
+    key: "${CI_COMMIT_REF_SLUG}"
+    paths:
+      - .cache/pip
+  before_script:
+    - pip install lmx
+  script:
+    - |
+      echo "$CI_MERGE_REQUEST_DESCRIPTION" | lmx pick --stdin --code --budget 5.00 --json
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
