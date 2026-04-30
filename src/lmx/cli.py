@@ -188,16 +188,13 @@ async def _pick(
     # Structured log: recommendation request (task hashed for privacy)
     task_hash = hashlib.sha256(task.encode()).hexdigest()[:16]
     logger.info(
-        "recommendation_request",
-        extra={
-            "task_hash": task_hash,
-            "task_len": len(task),
-            "task_type": task_type.value,
-            "budget": budget or prefs.default_budget,
-            "recommended_model": recommendations[0].model_id if recommendations else None,
-            "provider_count": len(providers),
-        },
-    })
+        "task_hash=%s type=%s budget=%s model=%s providers=%d",
+        task_hash,
+        task_type.value,
+        budget or prefs.default_budget,
+        recommendations[0].model_id if recommendations else None,
+        len(providers),
+    )
 
     if not recommendations:
         console.print("[red]No suitable models found for your task and budget.[/red]")
