@@ -68,8 +68,17 @@ lmx pick "Write a Python API server" --code --budget 5.00
 ### Developer Experience
 - **Interactive mode** — TUI walkthrough for exploring models and tradeoffs
 - **JSON output** — `lmx pick "task" --json` for scripting and CI integration
+- **Stdin support** — `echo "task" | lmx pick --stdin` for CI/CD pipelines
+- **ENV overrides** — `LMX_BUDGET`, `LMX_JSON`, `LMX_VERBOSE` environment variable support
 - **Configurable weights** — Override default quality/cost/speed weights per task
 - **Rich CLI output** — Colorized, formatted output that actually looks good
+- **Structured logging** — Privacy-safe task hashing, provider health tracking
+
+### Production-Ready
+- **Actual API inference** — All 5 providers make real httpx calls, not stubs
+- **Retry with backoff** — Exponential backoff (3 attempts) on timeout/rate-limit errors
+- **Model-family token estimation** — OpenAI (0.25x), Anthropic/LLaMA (0.30x) chars-to-tokens
+- **Quality scores versioned** — Benchmark-pinned to 2026-05-01 with source attribution
 
 ---
 
@@ -94,6 +103,7 @@ lmx pick "Write a Python API server" --code --budget 5.00
 | `--models`, `-m` | Restrict to specific models | all |
 | `--json`, `-j` | JSON output | — |
 | `--verbose`, `-v` | Verbose scoring details | — |
+| `--stdin` | Read task from stdin (CI/CD) | — |
 
 ---
 
@@ -187,7 +197,7 @@ weights:
 
 ## 📊 Scoring Details
 
-The composite score adapts based on your budget:
+The composite score adapts based on your budget. Quality scores are version-pinned to 2026-05-01 using LMSYS Chatbot Arena, OpenCompass, and HuggingFace Open LLM Leaderboard data.
 
 ### Low budget (< $0.50)
 ```
@@ -201,8 +211,9 @@ score = quality × 0.45 + cost_efficiency × 0.30 + speed × 0.25
 
 ### High budget (≥ $5.00)
 ```
-score = quality × 0.55 + cost_efficiency × 0.15 + speed × 0.30
-# + quality_boost = min(quality × 1.3, 1.0) for top models
+score = quality × 0.55 + speed × 0.30 + premium_bonus
+# quality_boost = min(quality × 1.3, 1.0) capped at 1.0
+# premium_bonus up to +0.12 for models costing > 30% of budget
 ```
 
 Budget filter: any model with estimated cost > `budget × 10` is excluded before scoring.
