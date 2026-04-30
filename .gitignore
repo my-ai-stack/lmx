@@ -13,4 +13,4 @@ build/
 htmlcov/
 site/
 .env
-.env.local
+.env.localuv.lock
