@@ -38,8 +38,17 @@ class PreferenceManager:
                     actual_cost REAL,
                     input_tokens INTEGER,
                     output_tokens INTEGER,
-                    success BOOLEAN
+                    success INTEGER NOT NULL DEFAULT 1
                 )
+            """)
+            conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_usage_timestamp ON usage(timestamp DESC)
+            """)
+            conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_usage_model_id ON usage(model_id)
+            """)
+            conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_usage_task_type ON usage(task_type)
             """)
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS savings (
@@ -129,6 +138,9 @@ class PreferenceManager:
         """Log a request for history tracking."""
         from datetime import datetime
 
+        # SQLite doesn't have native BOOLEAN — store as INTEGER 0/1
+        success_int = 1 if success else 0
+
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("""
                 INSERT INTO usage
@@ -145,7 +157,7 @@ class PreferenceManager:
                 actual_cost,
                 input_tokens,
                 output_tokens,
-                success,
+                success_int,
             ))
 
     def get_total_spend(self, period: str = "this-month") -> float:

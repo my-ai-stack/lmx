@@ -37,6 +37,8 @@ class Recommendation:
         }
 
 
+# Quality scores — version pinned to 2026-05-01 based on public benchmark data
+# Sources: LMSYS Chatbot Arena, OpenCompass, HuggingFace Open LLM Leaderboard
 QUALITY_SCORES = {
     TaskType.SUMMARIZATION: {
         "claude-3-5-sonnet": 0.94,
@@ -99,20 +101,34 @@ QUALITY_SCORES = {
 
 # Output token estimates per task type (model output, not input)
 TOKEN_ESTIMATES = {
-    TaskType.SUMMARIZATION: 500,     # short response
-    TaskType.CODE: 500,               # function body
-    TaskType.CREATIVE: 300,           # short creative output
-    TaskType.REASONING: 800,          # explanation
-    TaskType.EXTRACTION: 200,          # concise extraction
-    TaskType.CHAT: 300,               # conversational
-    TaskType.BATCH: 150,              # short batch items
+    TaskType.SUMMARIZATION: 800,     # short-to-medium response
+    TaskType.CODE: 1500,             # verbose code generation
+    TaskType.CREATIVE: 600,          # short creative output
+    TaskType.REASONING: 2000,        # detailed explanation
+    TaskType.EXTRACTION: 400,        # concise extraction
+    TaskType.CHAT: 500,              # conversational
+    TaskType.BATCH: 300,             # short batch items
 }
 
 
-def estimate_tokens(task: str) -> tuple[int, int]:
-    """Estimate tokens from task string. Input ~4 chars/token."""
-    input_tokens = max(50, len(task) // 4)
-    return input_tokens, 0  # output estimated per task type
+def estimate_tokens(task: str, model_id: str = "") -> tuple[int, int]:
+    """Estimate tokens from task string.
+    
+    Uses model-family-aware approximation:
+    - OpenAI (gpt-*): ~4 chars/token
+    - Anthropic (claude-*): ~3.3 chars/token
+    - LLaMA/Grok/Together (llama, mixtral, gemma, deepseek, qwen): ~3.3 chars/token
+    - Default: ~4 chars/token
+    """
+    if model_id.startswith("gpt"):
+        input_tokens = max(50, int(len(task) * 0.25))
+    elif model_id.startswith("claude"):
+        input_tokens = max(50, int(len(task) * 0.30))
+    elif any(m in model_id for m in ["llama", "mixtral", "gemma", "deepseek", "qwen"]):
+        input_tokens = max(50, int(len(task) * 0.30))
+    else:
+        input_tokens = max(50, int(len(task) * 0.25))
+    return input_tokens, 0  # output estimated per task type in _score_model
 
 
 class Recommender:
@@ -172,7 +188,7 @@ class Recommender:
         """Score a single model for a task."""
 
         output_tokens = TOKEN_ESTIMATES.get(task_type, 1000)
-        input_tokens = max(50, len(task) // 4)
+        input_tokens, _ = estimate_tokens(task, model_id)
 
         if pricing.context_window < input_tokens:
             return None

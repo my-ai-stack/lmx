@@ -1,7 +1,11 @@
 """CLI entrypoint for lmx."""
 
 import asyncio
+import hashlib
 import json
+import logging
+import os
+import sys
 from typing import Optional
 
 import click
@@ -15,6 +19,14 @@ from lmx.recommender import Recommender
 from lmx.preferences import PreferenceManager
 from lmx.formatter import format_recommendation, print_alternatives
 from lmx.providers import get_available_providers
+
+# Structured logging setup
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger("lmx")
 
 console = Console()
 
@@ -42,15 +54,24 @@ def cli(ctx):
 @click.option('--models', '-m', help='Comma-separated model list to consider')
 @click.option('--json', '-j', 'json_output', is_flag=True, help='JSON output')
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output')
+@click.option('--stdin', is_flag=True, help='Read task from stdin')
 @click.pass_context
-def pick_cmd(ctx, task, budget, code, batch, models, json_output, verbose):
+def pick_cmd(ctx, task, budget, code, batch, models, json_output, verbose, stdin):
     """Pick the best model for your task."""
-    # If no task given and no subcommand triggered, enter interactive
-    if not task:
+    # ENV overrides
+    budget = budget or float(os.environ.get('LMX_BUDGET', 0))
+    json_output = json_output or bool(os.environ.get('LMX_JSON'))
+    verbose = verbose or bool(os.environ.get('LMX_VERBOSE'))
+
+    # STDIN support for CI/CD piping
+    if stdin and not sys.stdin.isatty():
+        task_str = sys.stdin.read().strip()
+    elif not task:
         _interactive_mode()
         return
+    else:
+        task_str = ' '.join(task)
 
-    task_str = ' '.join(task)
     asyncio.run(_pick(task_str, budget, code, batch, models, json_output, verbose))
 
 
@@ -63,9 +84,19 @@ def pick_cmd(ctx, task, budget, code, batch, models, json_output, verbose):
 @click.option('--models', '-m')
 @click.option('--json', '-j', 'json_output', is_flag=True)
 @click.option('--verbose', '-v', is_flag=True)
-def main_cmd(task, budget, code, batch, models, json_output, verbose):
+@click.option('--stdin', is_flag=True)
+def main_cmd(task, budget, code, batch, models, json_output, verbose, stdin):
     """Pick the best model for your task."""
-    task_str = ' '.join(task)
+    # ENV overrides
+    budget = budget or float(os.environ.get('LMX_BUDGET', 0))
+    json_output = json_output or bool(os.environ.get('LMX_JSON'))
+    verbose = verbose or bool(os.environ.get('LMX_VERBOSE'))
+
+    # STDIN support
+    if stdin and not sys.stdin.isatty():
+        task_str = sys.stdin.read().strip()
+    else:
+        task_str = ' '.join(task)
     asyncio.run(_pick(task_str, budget, code, batch, models, json_output, verbose))
 
 
@@ -153,6 +184,20 @@ async def _pick(
         providers=providers,
         model_filter=models.split(",") if models else None,
     )
+
+    # Structured log: recommendation request (task hashed for privacy)
+    task_hash = hashlib.sha256(task.encode()).hexdigest()[:16]
+    logger.info(
+        "recommendation_request",
+        extra={
+            "task_hash": task_hash,
+            "task_len": len(task),
+            "task_type": task_type.value,
+            "budget": budget or prefs.default_budget,
+            "recommended_model": recommendations[0].model_id if recommendations else None,
+            "provider_count": len(providers),
+        },
+    })
 
     if not recommendations:
         console.print("[red]No suitable models found for your task and budget.[/red]")
