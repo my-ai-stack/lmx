@@ -18,7 +18,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install lmx
-        run: pip install lmx
+        run: pip install git+https://github.com/my-ai-stack/lmx.git
 
       - name: Pick cheapest model for task
         env:
@@ -47,7 +47,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install lmx
-        run: pip install lmx
+        run: pip install git+https://github.com/my-ai-stack/lmx.git
 
       - name: Code review with premium model
         env:
