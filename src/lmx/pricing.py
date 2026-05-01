@@ -88,8 +88,11 @@ class PricingCache:
             # Together AI
             "deepseek-coder-v2": ModelPricing("together", "deepseek-coder-v2", 1.20, 1.20, 128000, True, False),
             "qwen-2.5-72b": ModelPricing("together", "qwen-2.5-72b", 1.20, 1.20, 128000, True, False),
-            # Cerebras
-            "cerebras-llama-3.1-70b": ModelPricing("cerebras", "llama-3.1-70b", 0.60, 0.60, 128000, True, False),
+            # Cerebras (wafer-scale GPU, fastest inference)
+            "gpt-oss-120b": ModelPricing("cerebras", "gpt-oss-120b", 0.60, 0.60, 128000, True, False),
+            "qwen-3-235b-a22b-instruct-2507": ModelPricing("cerebras", "qwen-3-235b-a22b-instruct-2507", 0.80, 0.80, 128000, True, False),
+            "llama3.1-8b": ModelPricing("cerebras", "llama3.1-8b", 0.03, 0.03, 131072, True, False),
+            "zai-glm-4.7": ModelPricing("cerebras", "zai-glm-4.7", 0.04, 0.04, 131072, True, False),
         }
 
     async def refresh(self):

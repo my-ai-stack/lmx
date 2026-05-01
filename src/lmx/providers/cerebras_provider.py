@@ -13,8 +13,10 @@ class CerebrasProvider(BaseProvider):
 
     def _get_available_models(self) -> List[str]:
         return [
-            "llama-3.1-70b",
-            "llama-3.1-8b",
+            "gpt-oss-120b",   # Cerebras 120B — their flagship model
+            "qwen-3-235b-a22b-instruct-2507",  # 235B OpenChat variant
+            "llama3.1-8b",     # 8B lightweight
+            "zai-glm-4.7",     # 4.7B compact
         ]
 
     @retry(
@@ -47,4 +49,5 @@ class CerebrasProvider(BaseProvider):
 
     @property
     def speed_score(self) -> float:
-        return 0.95
+        # Wafer-scale GPU — fastest inference available
+        return 0.98

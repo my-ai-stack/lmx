@@ -50,10 +50,12 @@ QUALITY_SCORES = {
         "gpt-4o-mini": 0.80,
         "llama-3.1-8b": 0.70,
         "mixtral-8x7b": 0.74,
+        "gpt-oss-120b": 0.82,   # Cerebras 120B
+        "qwen-3-235b-a22b-instruct-2507": 0.80,
     },
     TaskType.CODE: {
         "claude-3-5-sonnet": 0.94,
-        "claude-3-opus": 0.96,
+        "claude-3-opus": 0.98,
         "gpt-4o": 0.96,
         "o1": 0.97,
         "o3-mini": 0.95,
@@ -62,6 +64,8 @@ QUALITY_SCORES = {
         "gpt-4o-mini": 0.84,
         "llama-3.1-8b": 0.72,
         "qwen-2.5-72b": 0.80,
+        "gpt-oss-120b": 0.88,   # Cerebras 120B — strong general code
+        "qwen-3-235b-a22b-instruct-2507": 0.86,
     },
     TaskType.CREATIVE: {
         "claude-3-5-sonnet": 0.88,
@@ -70,6 +74,7 @@ QUALITY_SCORES = {
         "claude-3-opus": 0.92,
         "gpt-4o-mini": 0.80,
         "qwen-2.5-72b": 0.78,
+        "gpt-oss-120b": 0.86,   # Cerebras 120B strong creative
     },
     TaskType.REASONING: {
         "o1": 0.98,
@@ -77,18 +82,25 @@ QUALITY_SCORES = {
         "claude-3-opus": 0.94,
         "claude-3-5-sonnet": 0.90,
         "gpt-4o": 0.88,
+        "gpt-oss-120b": 0.89,   # Cerebras 120B for reasoning
+        "qwen-3-235b-a22b-instruct-2507": 0.91,  # Qwen 235B strong reasoning
     },
     TaskType.EXTRACTION: {
         "claude-3-5-sonnet": 0.92,
         "gpt-4o": 0.90,
         "llama-3.1-70b": 0.80,
         "gpt-4o-mini": 0.82,
+        "qwen-2.5-72b": 0.78,
+        "qwen-3-235b-a22b-instruct-2507": 0.79,
     },
     TaskType.CHAT: {
         "claude-3-5-sonnet": 0.90,
         "gpt-4o": 0.90,
         "llama-3.1-70b": 0.85,
         "gpt-4o-mini": 0.82,
+        "gpt-oss-120b": 0.88,   # Cerebras 120B flagship
+        "llama3.1-8b": 0.74,   # Cerebras 8B
+        "zai-glm-4.7": 0.70,    # Cerebras compact
     },
     TaskType.BATCH: {
         "llama-3.1-70b": 0.82,
@@ -96,6 +108,8 @@ QUALITY_SCORES = {
         "claude-3-5-haiku": 0.80,
         "mixtral-8x7b": 0.78,
         "llama-3.1-8b": 0.72,
+        "gpt-oss-120b": 0.85,   # Cerebras 120B strong for batch
+        "llama3.1-8b": 0.75,   # Cerebras 8B good for cheap batch
     },
 }
 
