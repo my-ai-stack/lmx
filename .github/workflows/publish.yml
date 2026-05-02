@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
-      id-token: write  # For trusted publishing
+      id-token: write
       contents: read
 
     steps:
@@ -22,12 +22,11 @@ jobs:
         python-version: '3.11'
 
     - name: Install build tools
-      run: pip install build hatchling
+      run: pip install build twine
 
     - name: Build package
       run: python -m build
 
-    - name: Publish to PyPI
-      uses: pypi-publish@v1
-      with:
-        packages-dir: dist/
+    - name: Publish to PyPI (trusted publishing)
+      uses: pypa/gh-action-pypi-publish@release/v1
+      # No password needed - uses OIDC trusted publishing
