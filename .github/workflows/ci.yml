@@ -37,5 +37,12 @@ jobs:
     - name: Type check with mypy
       run: mypy . || true
     
-    - name: Test with pytest
-      run: pytest tests/ -v || true
+    - name: Run unit tests
+      run: pytest tests/ -v -m "not integration" || true
+    
+    - name: Run integration tests (if API keys available)
+      run: pytest tests/ -v -m "integration" || true
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
