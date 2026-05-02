@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
-      id-token: write
       contents: read
 
     steps:
@@ -27,6 +26,7 @@ jobs:
     - name: Build package
       run: python -m build
 
-    - name: Publish to PyPI (trusted publishing)
+    - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      # No password needed - uses OIDC trusted publishing
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
