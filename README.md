@@ -1,3 +1,10 @@
+[![PyPI version](https://img.shields.io/pypi/v/lmx.svg)](https://pypi.org/project/lmx/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/lmx.svg)](https://pypi.org/project/lmx/)
+[![HuggingFace Spaces](https://img.shields.io/badge/🤗%20Spaces-lmx-blue)](https://huggingface.co/spaces/my-ai-stack/lmx)
+[![GitHub stars](https://img.shields.io/github/stars/my-ai-stack/lmx.svg)](https://github.com/my-ai-stack/lmx)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+# lmx — The Smart Model Picker for LLMs
 # lmx — The Smart Model Picker for LLMs
 
 > **Stop guessing which model to use. Let `lmx` pick the right one — every time.**
