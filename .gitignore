@@ -13,4 +13,12 @@ build/
 htmlcov/
 site/
 .env
-.env.localuv.lock
+.env.local
+uv.lock
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
